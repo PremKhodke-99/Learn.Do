@@ -23,11 +23,24 @@ const generateMCQ = (
     return mcqOptions;
 }
 
+const generator = (): string[] => {
+    const arr = generate(8);
+
+    let array: string [] = [];
+
+    for(let i = 0;i < arr.length; i++){
+        array.push(arr[i]);
+    }
+    console.log(array)
+    return array;
+}
+
 export const translateWords = async (params: LangType): Promise<WordType[]> => {
     try {
-        const words = generate(8).map((i) => ({
-            Text: i,
-        }));
+
+        const words = generator().map((i) => ({
+            Text: i
+        }))
 
         const rapidkey = import.meta.env.VITE_RAPID_API
 

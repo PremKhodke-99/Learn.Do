@@ -29,6 +29,8 @@ export const translateWords = async (params: LangType): Promise<WordType[]> => {
             Text: i,
         }));
 
+        const rapidkey = import.meta.env.VITE_RAPID_API
+
         const response = await axios.post(`https://microsoft-translator-text.p.rapidapi.com/translate`, words,
             {
                 params: {
@@ -39,7 +41,7 @@ export const translateWords = async (params: LangType): Promise<WordType[]> => {
                 },
                 headers: {
                     'content-type': 'application/json',
-                    'X-RapidAPI-Key': 'c094c40d6bmshda8df5f738f0a6dp17a659jsn7cd89935519b',
+                    'X-RapidAPI-Key': rapidkey,
                     'X-RapidAPI-Host': 'microsoft-translator-text.p.rapidapi.com'
                 },
             }
@@ -70,13 +72,47 @@ export const countMatching = (
     arr1: string[], arr2: string[]
 ): number => {
 
-    if(arr1.length !== arr2.length) throw new Error("Arrays are not equal");
+    if (arr1.length !== arr2.length) throw new Error("Arrays are not equal");
 
     let matchingCount = 0;
 
-    for(let i = 0; i < arr1.length; i++){
-        if(arr1[i] === arr2[i]) matchingCount++;
+    for (let i = 0; i < arr1.length; i++) {
+        if (arr1[i] === arr2[i]) matchingCount++;
     }
 
     return matchingCount;
+}
+
+export const fetchAudio = async (text: string, language: LangType): Promise<string> => {
+
+    const key = import.meta.env.VITE_TEXT_TO_SPEECH_API
+    const rapidkey = import.meta.env.VITE_RAPID_API
+
+    const encodedParams = new URLSearchParams({
+        src: text,
+        r: "0",
+        c: "mp3",
+        f: "8khz_8bit_mono",
+        b64: "true"
+    });
+
+    if (language === "ja") encodedParams.set("hl", "ja-jp");
+    else if (language === "es") encodedParams.set("hl", "es-es")
+    else if (language === "fr") encodedParams.set("hl", "fr-fr")
+    else encodedParams.set("hl", "hi-in");
+
+
+    const { data }: { data: string } = await axios.post("https://voicerss-text-to-speech.p.rapidapi.com/", encodedParams, {
+        params: {
+            key
+        },
+        headers: {
+            'content-type': 'application/x-www-form-urlencoded',
+            'X-RapidAPI-Key': rapidkey,
+            'X-RapidAPI-Host': 'voicerss-text-to-speech.p.rapidapi.com'
+        },
+    });
+
+
+    return data;
 }

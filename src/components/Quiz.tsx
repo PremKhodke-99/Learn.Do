@@ -1,6 +1,8 @@
 import { Button, Container, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Typography } from "@mui/material";
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { saveResult } from "../redux/slices";
 
 const Quiz = () => {
 
@@ -9,6 +11,10 @@ const Quiz = () => {
   const [ans, setAns] = useState<string>("");
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+
+  const { words } = useSelector((state: { root: StateType }) => state.root);
 
   const nextHandler = (): void => {
     setResult((prev) => [...prev, ans]);
@@ -16,12 +22,17 @@ const Quiz = () => {
     setAns("");
   }
 
+  useEffect(() => {
+    if (count + 1 > words.length) navigate("/result");
+    dispatch(saveResult(result));
+  }, [result]);
+
   return (
     <Container maxWidth="sm" sx={{ padding: "1rem" }}>
       <Typography m={"2rem 0"}>Quiz</Typography>
 
       <Typography variant={"h3"}>
-        {count + 1} - {"Randoms"}
+        {count + 1} - {words[count]?.word}
       </Typography>
 
       <FormControl>
@@ -37,11 +48,16 @@ const Quiz = () => {
           value={ans}
           onChange={(e) => setAns(e.target.value)}
         >
-          <FormControlLabel
-            value={"Lol"}
-            control={<Radio />}
-            label={"Option 1"}
-          />
+          {
+            words[count]?.options.map(i => (
+              <FormControlLabel
+                value={i}
+                control={<Radio />}
+                label={i}
+                key={i}
+              />
+            ))
+          }
         </RadioGroup>
       </FormControl>
 
@@ -53,9 +69,9 @@ const Quiz = () => {
         fullWidth
         onClick={nextHandler}
         disabled={ans === ""}
-        // onClick={}
+      // onClick={}
       >
-        {count === 7 ? "Submit" : "Next"}
+        {count === words.length - 1 ? "Submit" : "Next"}
       </Button>
     </Container>
   )

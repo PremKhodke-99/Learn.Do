@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { translateWords } from "../utils/features";
 import { useDispatch, useSelector } from "react-redux";
-import { getWordsFail, getWordsRequest, getWordsSuccess } from "../redux/slices";
+import { clearState, getWordsFail, getWordsRequest, getWordsSuccess } from "../redux/slices";
 import Loader from "./Loader";
 
 const Learning = () => {
@@ -14,7 +14,7 @@ const Learning = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { loading, error, words } = useSelector((state: { root: StateType }) => state.root)
+  const { loading, error, words } = useSelector((state: { root: StateType }) => state.root);
 
   const nextHandler = (): void => {
     setCount((prev) => prev + 1);
@@ -32,6 +32,11 @@ const Learning = () => {
         console.log(err);
         dispatch(getWordsFail(err));
       });
+
+      if(error){
+        alert(error);
+        dispatch(clearState())
+      }
 
   }, []);
 
@@ -68,7 +73,7 @@ const Learning = () => {
         }}
         variant="contained"
         fullWidth
-        onClick={count === 7 ? () => navigate("/quiz") : nextHandler}
+        onClick={count === words.length - 1 ? () => navigate("/quiz") : nextHandler}
       >
         {count === 7 ? "Text" : "Next"}
       </Button>
